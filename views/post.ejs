@@ -1,0 +1,11 @@
+<%- include header.ejs %>
+<form method="post" class="form-inline">
+    Title:<br />
+    <input type="text" name="title" class="form-control"/><br />
+    Tags:<br />
+    <input type="text" name="tag1" class="form-control" /><input type="text" name="tag2" class="form-control" /><input type="text" name="tag3" class="form-control" /><br />
+    Content:<br />
+    <textarea name="post" rows="20" cols="100" class="form-control"></textarea><br />
+    <input type="submit" value="Submit" class="btn btn-success"/>
+</form>
+<%- include footer.ejs %>

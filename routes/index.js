@@ -3,7 +3,7 @@ var router = express.Router();
 
 //import controllers
 var User = require('../controllers/user_controller.js');
-
+var Post = require('../controllers/post_controller.js');
 
 //import MD5 component
 var md5 = require('../lib/md5.js');
@@ -108,6 +108,34 @@ router.get('/logout', function(req, res){
 	req.flash('success', 'Sign out successfully');
 	res.redirect('/login')
 });
+
+router.get('/post', checkLogin);
+router.get('/post', function(req, res){
+	res.render('post', {
+		title: 'Post',
+		user: req.session.user,
+		success: req.flash('success').toString(),
+		error: req.flash('error').toString()
+	});
+});
+
+router.post('/post', checkLogin);
+router.post('/post', function(req, res){
+	//get data from client
+	var currentUser = req.session.user,
+		tags = [req,body.tag1, req.body.tag2, req.body.tag3],
+		post = new Post(currentUser.name, currentUser.head, req.body.title, tags, req.body.post);
+	//save data
+	post.save(function(err){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		req.flash('success', 'Post successfully');
+		req.redirect('/');
+	});
+});
+
 
 //authority check
 function checkLogin(req, res, next){
