@@ -25,9 +25,9 @@ Post.prototype.save = function(callback){
 		date: date,
 		year: date.getFullYear(),
 		month: date.getFullYear() + "-" + (date.getMonth() + 1),
-		day: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" date.getDate() + " " + 
+		day: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +  date.getDate() + " " + 
 			date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + 
-					date.getMinutes() : date.getMinutes());
+					date.getMinutes() : date.getMinutes())
 	};
 	var post = {
 		name: this.name,
@@ -58,11 +58,10 @@ Post.prototype.save = function(callback){
 				if(err){
 					return callback(err);
 				}
-				callback(null);// return null error
+				callback(null);// return null erro
 			});
 		});
 	});
-
 };
 
 /**
@@ -235,7 +234,7 @@ Post.edit = function(_id, callback){
 				callback(null, doc);
 			});
 		});
-	};
+	});
 };
 
 /**
@@ -423,7 +422,7 @@ Post.reprint = function(reprint_from, reprint_to, callback){
 				"name": reprint_from.name,
 				"time.day": reprint_from.day,
 				"title": reprint_from.title
-			}, function(err, doc{
+			}, function(err, doc){
 				if(err){
 					mongodb.close();
 					return callback(err);
@@ -446,7 +445,7 @@ Post.reprint = function(reprint_from, reprint_to, callback){
 				doc.title = (doc.title.search(/[forword]/) > -1)? doc.title: "[forword]" + 
 					doc.title;
 				doc.comments = [];
-				doc.reprint_info = ["reprint_from": reprint_from];
+				doc.reprint_info = {"reprint_from": reprint_from};
 				doc.pv = 0;
 				
 				//update

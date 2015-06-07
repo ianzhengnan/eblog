@@ -123,7 +123,7 @@ router.post('/post', checkLogin);
 router.post('/post', function(req, res){
 	//get data from client
 	var currentUser = req.session.user,
-		tags = [req,body.tag1, req.body.tag2, req.body.tag3],
+		tags = [req.body.tag1, req.body.tag2, req.body.tag3],
 		post = new Post(currentUser.name, currentUser.head, req.body.title, tags, req.body.post);
 	//save data
 	post.save(function(err){
@@ -132,7 +132,7 @@ router.post('/post', function(req, res){
 			return res.redirect('/');
 		}
 		req.flash('success', 'Post successfully');
-		req.redirect('/');
+		res.redirect('/');
 	});
 });
 

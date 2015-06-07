@@ -15,6 +15,7 @@
     "ejs": "~2.3.1",
     "express": "~4.12.4",
     "express-session": "^1.11.2",
+    "markdown": "^0.5.0",
     "media-typer": "^0.3.0",
     "mime-types": "^2.0.13",
     "mongodb": "^2.0.33",
