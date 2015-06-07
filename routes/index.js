@@ -9,13 +9,23 @@ var Post = require('../controllers/post_controller.js');
 var md5 = require('../lib/md5.js');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { 
-  	title: 'Express',
-  	user: req.session.user,
-  	success: req.flash('success').toString(),
-    error: req.flash('error').toString()
-  });
+router.get('/', function(req, res) {
+	var page = req.query.p ? parseInt(req.query.p) : 1;
+	Post.getTen(null, page, function(err, posts, total){
+		if(err){
+			posts = [];
+		}
+		res.render('index', { 
+  		title: 'Home',
+  		posts: posts,
+  		page: page,
+  		isFirstPage: (page - 1) == 0,
+  		isLastPage: ((page - 1) * 10 + posts.length) == total,
+  		user: req.session.user,
+  		success: req.flash('success').toString(),
+    	error: req.flash('error').toString()
+  		});
+	});
 });
 
 
