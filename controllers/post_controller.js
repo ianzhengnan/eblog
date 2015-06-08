@@ -33,7 +33,7 @@ Post.prototype.save = function(callback){
 	var post = {
 		name: this.name,
 		head: this.head,
-		times: time,
+		time: time,
 		title: this.title,
 		tags: this.tags,
 		post: this.post,
