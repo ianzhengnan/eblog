@@ -247,20 +247,25 @@ Post.edit = function(_id, callback){
 Post.update = function(_id, post, callback){
 	mongodb.open(function(err, db){
 		if(err){
-			mongodb.close();
 			return callback(err);
 		}
 		//update article content
-		collection.update({
-			"_id": new ObjectID(_id)
-		}, {
-			$set: {post: post}
-		}, function(err){
-			mongodb.close();
+		db.collection('posts', function(err, collection){
 			if(err){
+				mongodb.close();
 				return callback(err);
 			}
-			callback(err);
+			collection.update({
+				"_id": new ObjectID(_id)
+			}, {
+				$set: {post: post}
+			}, function(err){
+				mongodb.close();
+				if(err){
+					return callback(err);
+				}
+				callback(err);
+			});
 		});
 	});
 };
@@ -403,7 +408,7 @@ Post.search = function(title, callback){
 /**
  * Forward articles
  * @param reprint_from
- * @param reprint+to
+ * @param reprint_to
  * @param callback
  */
 Post.reprint = function(reprint_from, reprint_to, callback){
@@ -434,23 +439,21 @@ Post.reprint = function(reprint_from, reprint_to, callback){
 			        year : date.getFullYear(),
 			        month : date.getFullYear() + "-" + (date.getMonth() + 1),
 			        day : date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
-			        minute : date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + 
-				date.getDate() + " " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + 
-					date.getMinutes() : date.getMinutes())
+			        minute : date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" +
+			         (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
 				};
 				delete doc._id;//the old one should be delete
 				
 				doc.name = reprint_to.name;
 				doc.head = reprint_to.head;
 				doc.time = time;
-				doc.title = (doc.title.search(/[forword]/) > -1)? doc.title: "[forword]" + 
-					doc.title;
+				doc.title = (doc.title.search(/[forword]/) > -1) ? doc.title: "[forword]" + doc.title;
 				doc.comments = [];
 				doc.reprint_info = {"reprint_from": reprint_from};
 				doc.pv = 0;
 				
 				//update
-				collecton.update({
+				collection.update({
 					"name": reprint_from.name,
 					"time.day": reprint_from.day,
 					"title": reprint_from.title	
@@ -471,12 +474,12 @@ Post.reprint = function(reprint_from, reprint_to, callback){
 				//
 				collection.insert(doc, {
 					safe: true
-				},function(err, post){
+				},function(err, post1){
 					mongodb.close();
 					if(err){
 						return callback(err);
 					}
-					callback(err, post[0]);
+					callback(err, doc);
 				});
 			});
 		});

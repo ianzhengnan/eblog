@@ -1,0 +1,45 @@
+<%- include header.ejs %>
+<p>
+    <% if (user && (user.name == post.name)) { %>
+    <span><a class="edit" href="/edit/<%= post._id %> %>">Edit</a></span> |
+    <span><a class="edit" href="/remove/<%= post.name %>/<%= post.time.day %>/<%= post.title %>">Delete</a></span>
+    <% } %>
+    <% var flag = 1 %>
+    <% if (user && (user.name != post.name)) { %>
+    <% if ((post.reprint_info.reprint_from != undefined) && (user.name == post.reprint_info.reprint_from.name)) { %>
+    <% flag = 0 %>
+    <% } %>
+    <% if ((post.reprint_info.reprint_to != undefined)) { %>
+    <% post.reprint_info.reprint_to.forEach(function (reprint_to, index) { %>
+    <% if (user.name == reprint_to.name) { %>
+    <% flag = 0 %>
+    <% } %>
+    <% }) %>
+    <% } %>
+    <% } else { %>
+    <% flag = 0 %>
+    <% } %>
+    <% if (flag) { %>
+    <span><a class="edit" href="/reprint/<%= post._id %>">Forward</a></span>
+    <% } %>
+</p>
+<p class="info">
+    Author：<a href="/u/<%= post.name %>"><%= post.name %></a> |
+    Date：<%= post.time.minute %>
+    <% if (post.reprint_info.reprint_from) { %>
+    <br><a href="/u/<%= post.reprint_info.reprint_from.name %>/<%= post.reprint_info.reprint_from.day %>/<%= post.reprint_info.reprint_from.title %>">Origin Link</a>
+    <% } %>
+</p>
+<p><%- post.post %></p>
+<p class="info">
+    Read：<%= post.pv %> |
+    Comment：<%= post.comments.length %> |
+    Forward：
+    <% if (post.reprint_info.reprint_to) { %>
+    <%= post.reprint_info.reprint_to.length %>
+    <% } else { %>
+    <%= 0 %>
+    <% } %>
+</p>
+<%- include comment.ejs %>
+<%- include footer.ejs %>

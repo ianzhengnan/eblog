@@ -4,6 +4,7 @@ var router = express.Router();
 //import controllers
 var User = require('../controllers/user_controller.js');
 var Post = require('../controllers/post_controller.js');
+var Comment = require('../models/comment.js');
 
 //import MD5 component
 var md5 = require('../lib/md5.js');
@@ -146,6 +147,132 @@ router.post('/post', function(req, res){
 	});
 });
 
+//Get article
+router.get('/p/:_id', checkLogin);
+router.get('/p/:_id', function(req, res){
+	Post.getOne(req.params._id, function(err, post){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		res.render('article',{
+			title: post.title,
+			post: post,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+});
+
+//comment
+router.post('/p/:_id', checkLogin);
+router.post('/p/:_id', function(req, res){
+	var date = new Date(),
+		time = date.getFullYear() + "-" + (date.getMonth() + 1) + date.getDate() + " " +
+			date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes():date.getMinutes());
+
+	var email_MD5 = md5(req.body.email.toLowerCase()),
+		head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48";
+
+	var comment = {
+		name: req.body.name,
+		head: head, 
+		time: time,
+		email: req.body.email,
+		website: req.body.website,
+		content: req.body.content
+	};
+
+	var newComment = new Comment(req.params._id, comment);
+	newComment.save(function(err){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('back');
+		}
+		req.flash('success', 'Comment successfully');
+		res.redirect('back');
+	});
+});
+
+//edit
+router.get('/edit/:_id', checkLogin);
+router.get('/edit/:_id', function(req,res){
+	Post.edit(req.params._id, function(err, post){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('back');
+		}
+		res.render('edit', {
+			title: 'Edit',
+			post: post,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+});
+
+
+//edit post
+router.post('/edit/:_id', checkLogin);
+router.post('/edit/:_id', function(req, res){
+	Post.update(req.params._id, req.body.post, function(err){
+		var url = encodeURI('/p/' + req.params._id);
+		if(err){
+			req.flash('error', err);
+			return res.redirect(url);
+		}
+		req.flash('success', 'Update successfully');
+		res.redirect(url); //return current page
+	});
+});
+
+//delete
+router.get('/remove/:name/:day/:title', checkLogin);
+router.get('/remove/:name/:day/:title', function(req, res){
+	Post.remove(req.params.name, req.params.day, req.params.title, function(err){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('back');
+		}
+		req.flash('success', 'Delete successfully');
+		res.redirect('/');
+	});
+});
+
+//get orginal link
+router.get('/u/:name/:day/:title', function(req, res){
+
+});
+
+//forward article
+router.get('/reprint/:_id', checkLogin);
+router.get('/reprint/:_id', function(req, res){
+	Post.edit(req.params._id, function(err, post){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('back');
+		}
+		var currentUser = req.session.user,
+			reprint_from = {name: post.name, day: post.time.day, title: post.title},
+			reprint_to = {name: currentUser.name, head: currentUser.head};
+		Post.reprint(reprint_from, reprint_to, function(err, post){
+			if(err){
+				req.flash('error', err);
+				return res.redirect('back');
+			}
+			req.flash('success', 'Forward successfully');
+			var url = encodeURI('/p/' + post._id);
+			res.redirect(url);
+		});
+	});
+});
+
+//404 page
+router.use(function(req, res){
+	res.render('404');
+});
 
 //authority check
 function checkLogin(req, res, next){
@@ -155,7 +282,6 @@ function checkLogin(req, res, next){
 	}
 	next();
 }
-
 
 function checkNotLogin(req, res, next){
 	if(req.session.user){

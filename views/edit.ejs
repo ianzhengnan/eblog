@@ -1,0 +1,13 @@
+<%- include header.ejs %>
+<form method="post" class="form-inline">
+    Title：<br />
+    <input type="text" name="title" value="<%= post.title %>" disabled="disabled" class="form-control" /><br />
+    Tags：<br />
+    <input type="text" name="tag1" value="<%= post.tags[0] %>" disabled="disabled" class="form-control"/>
+    <input type="text" name="tag2" value="<%= post.tags[1] %>" disabled="disabled" class="form-control"/>
+    <input type="text" name="tag3" value="<%= post.tags[2] %>" disabled="disabled" class="form-control"/><br />
+    Content：<br />
+    <textarea name="post" rows="20" cols="100" class="form-control"><%= post.post %></textarea><br />
+    <input type="submit" value="Save" class="btn btn-success"/>
+</form>
+<%- include footer.ejs %>

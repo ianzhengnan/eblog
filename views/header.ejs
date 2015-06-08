@@ -28,8 +28,10 @@
           <a class="blog-nav-item" href="/archives">Archives</a>
           <a class="blog-nav-item" href="/tags">Tags</a>
           <a class="blog-nav-item" href="/about">About</a>
-          <form class="navbar-form navbar-right">
+          <form class="navbar-form navbar-right"> 
             <% if(user) {%>
+            
+            <a class="blog-nav-item"><%= user.name %></a>
             <a class="btn btn-success" href="/post" role="button">Post</a>
             <a class="btn btn-default" href="/logout" role="button">Sign out</a>
             <%} else { %>
