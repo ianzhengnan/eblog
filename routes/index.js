@@ -243,7 +243,24 @@ router.get('/remove/:name/:day/:title', function(req, res){
 
 //get orginal link
 router.get('/u/:name/:day/:title', function(req, res){
-
+	Post.getReprint(req.params.name, req.params.day, req.params.title, function(err, post){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		//
+		if(post == null){
+			req.flash('error', 'Content is blank');
+			return res.redirect('/');
+		}
+		res.render('article', {
+			title: post.title,
+			post: post,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
 });
 
 //forward article
@@ -268,6 +285,113 @@ router.get('/reprint/:_id', function(req, res){
 		});
 	});
 });
+
+//get archive
+router.get('/archives', function(req, res){
+	Post.getArchive(function(err, posts){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		res.render('archive', {
+			title: 'Archive',
+			posts: posts,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+});
+
+//get tags
+router.get('/tags', function(req, res){
+	Post.getTags(function(err, posts){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		res.render('tags', {
+			title: 'Tags',
+			posts: posts,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+});
+
+//get articles of tags
+router.get('/tags/:tag', function(req, res){
+	Post.getTag(req.params.tag, function(err, posts){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		res.render('tag',{
+			title: 'TAG:' + req.params.tag,
+			posts: posts,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+});
+
+//search articles
+router.get('/search', function(req, res){
+	Post.search(req.query.title, function(err, posts){
+		if(err){
+			req.flash('error', err);
+			return res.redirect('/');
+		}
+		res.render('search', {
+			title: 'SEARCH:' + req.query.title,
+			posts: posts,
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+});
+
+//Get articles by user
+router.get('/u/:name', function(req, res){
+  var page = req.query.p ? parseInt(req.query.p) : 1;
+  User.get(req.params.name, function(err, user){
+    if(!user){
+      req.flash('error', 'User not exist');
+      return res.redirect('/');
+    }
+    //return articles
+    Post.getTen(user.name, page, function(err, posts, total){
+      if(err){
+        req.flash('error', err);
+        return res.redirect('/');
+      }
+      res.render('user', {
+        title: user.name,
+        posts: posts,
+        page: page,
+        isFirstPage: (page - 1) == 0,
+        isLastPage: ((page - 1) * 10 + posts.length) == total,
+        user : req.session.user,
+        success : req.flash('success').toString(),
+        error : req.flash('error').toString()
+      });
+    });
+  });
+});
+
+//links
+router.get('/links', function(req, res){
+	res.render('links', {
+    title: 'Frinds Links',
+    user: req.session.user,
+    success: req.flash('success').toString(),
+    error: req.flash('error').toString()
+  });
+});
+
 
 //404 page
 router.use(function(req, res){

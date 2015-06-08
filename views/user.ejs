@@ -1,0 +1,24 @@
+<%- include header.ejs %>
+<% posts.forEach(function(post, index) { %>
+<p>
+<!--<a href="/u/<%= post.name %>"><img src="<%= post.head %>" class="r_head" /></a>--></p>
+<p class="info">
+    Author：<a href="/u/<%= post.name %>"><%= post.name %></a> |
+    Date：<%= post.time.minute%>
+    <% if (post.reprint_info.reprint_from) { %>
+    <br><a href="/u/<%= post.reprint_info.reprint_from.name %>/<%= post.reprint_info.reprint_from.day %>/<%= post.reprint_info.reprint_from.title %>">Original Link</a>
+    <% } %>
+</p>
+<p class="info">
+    Read：<%= post.pv %> |
+    Comments：<%= post.comments.length %> |
+    Forward：
+    <% if (post.reprint_info.reprint_to) { %>
+    <%= post.reprint_info.reprint_to.length %>
+    <% } else { %>
+    <%= 0 %>
+    <% } %>
+</p>
+<% }) %>
+<%- include paging.ejs %>
+<%- include footer.ejs %>

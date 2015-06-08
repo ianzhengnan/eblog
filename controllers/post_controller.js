@@ -271,10 +271,10 @@ Post.update = function(_id, post, callback){
 };
 
 /**
- * return archieve articles
+ * return archive articles
  * @param callback
  */
-Post.getArchieve = function(callback){
+Post.getArchive = function(callback){
 	//open database
 	mongodb.open(function(err, db){
 		if(err){
@@ -287,11 +287,8 @@ Post.getArchieve = function(callback){
 				return callback(err);
 			}
 			//return name, time and title
-			collection.find({
-				"name": 1,
-				"time": 1,
-				"title": 1
-			}).sort({
+			collection.find()
+			.sort({
 				time: -1
 			}).toArray(function(err, docs){
 				mongodb.close();
@@ -344,7 +341,8 @@ Post.getTag = function(tag, callback){
 			return callback(err);
 		}
 		//get posts
-		db.collection('post', function(err, collection){
+		console.log('Tag is-----------------' + tag);
+		db.collection('posts', function(err, collection){
 			if(err){
 				mongodb.close();
 				return callback(err);
@@ -352,10 +350,6 @@ Post.getTag = function(tag, callback){
 			//retrieve all articles in tags array
 			collection.find({
 				"tags": tag
-			},{
-				"name": 1,
-				"time": 1,
-				"title": 1
 			}).sort({
 				time: -1
 			}).toArray(function(err,docs){
@@ -366,7 +360,6 @@ Post.getTag = function(tag, callback){
 				callback(null, docs);
 			});
 		});
-
 	});
 };
 
@@ -377,30 +370,32 @@ Post.getTag = function(tag, callback){
  */
 Post.search = function(title, callback){
 	//open database
-	if(err){
-		return callback(err);
-	}
-	//read posts
-	db.collection('posts', function(err, collection){
+	mongodb.open(function(err, db){
 		if(err){
-			mongodb.close();
 			return callback(err);
 		}
-		var pattern = new RegExp(title, "i");
-		collection.find({
-			"title": pattern
-		},{
-			"name": 1,
-			"time": 1,
-			"title": 1
-		}).sort({
-			time: -1
-		}).toArray(function(err, docs){
-			mongodb.close();
+		//read posts
+		db.collection('posts', function(err, collection){
 			if(err){
+				mongodb.close();
 				return callback(err);
 			}
-			callback(null, docs);
+			var pattern = new RegExp(title, "i");
+			collection.find({
+				"title": pattern
+			},{
+				"name": 1,
+				"time": 1,
+				"title": 1
+			}).sort({
+				time: -1
+			}).toArray(function(err, docs){
+				mongodb.close();
+				if(err){
+					return callback(err);
+				}
+				callback(null, docs);
+			});
 		});
 	});
 };
@@ -474,7 +469,7 @@ Post.reprint = function(reprint_from, reprint_to, callback){
 				//
 				collection.insert(doc, {
 					safe: true
-				},function(err, post1){
+				},function(err){
 					mongodb.close();
 					if(err){
 						return callback(err);

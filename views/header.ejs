@@ -17,6 +17,7 @@
     <!-- Custom styles for this template -->
     <link href="/stylesheets/blog.css" rel="stylesheet">
     <script src="/javascripts/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="/javascripts/index.js"></script>
   </head>
 
   <body>
@@ -27,10 +28,12 @@
           <a class="blog-nav-item active" href="/">Home</a>
           <a class="blog-nav-item" href="/archives">Archives</a>
           <a class="blog-nav-item" href="/tags">Tags</a>
-          <a class="blog-nav-item" href="/about">About</a>
-          <form class="navbar-form navbar-right"> 
+          <a class="blog-nav-item" href="/links">About</a>
+          <form class="navbar-form navbar-right" method="GET" action="/search"> 
+            <div class="form-group">
+              <input id="search" type="text" placeholder="Search" name="title" class="form-control">
+            </div>
             <% if(user) {%>
-            
             <a class="blog-nav-item"><%= user.name %></a>
             <a class="btn btn-success" href="/post" role="button">Post</a>
             <a class="btn btn-default" href="/logout" role="button">Sign out</a>
